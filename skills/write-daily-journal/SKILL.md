@@ -9,7 +9,7 @@ description: 将保存下来的 JSONL 活动数据集整理成单日或日期区
 
 ## 工作流程
 
-1. 先抽样查看源 JSONL 的 10 到 20 行内容，再决定怎么跑。
+1. 先确认当前平台上的 VocoType 固定数据集路径存在，再抽样查看 10 到 20 行内容。
 2. 判断脚本内置的字段猜测是否已经够用。
 3. 运行 `scripts/jsonl_to_journal.py`，直接从原始记录生成结构化 Markdown 草稿。
 4. 只有在用户明确想要更自然、更像“日记”的语气时，才对草稿做润色。
@@ -21,18 +21,6 @@ description: 将保存下来的 JSONL 活动数据集整理成单日或日期区
 
 ```bash
 python3 scripts/jsonl_to_journal.py \
-  --input /path/to/data.jsonl \
-  --date 2026-03-23 \
-  --timezone Asia/Shanghai \
-  --output /path/to/journal/2026-03-23.md
-```
-
-当同一天的数据分散在多个文件里时：
-
-```bash
-python3 scripts/jsonl_to_journal.py \
-  --input /path/to/app.jsonl \
-  --input /path/to/notes.jsonl \
   --date 2026-03-23 \
   --timezone Asia/Shanghai \
   --output /path/to/journal/2026-03-23.md
@@ -42,7 +30,6 @@ python3 scripts/jsonl_to_journal.py \
 
 ```powershell
 py .\scripts\jsonl_to_journal.py `
-  --input C:\data\events.jsonl `
   --date 2026-03-23 `
   --timezone "China Standard Time" `
   --output C:\journal\2026-03-23.md
@@ -52,7 +39,6 @@ py .\scripts\jsonl_to_journal.py `
 
 ```bash
 python3 scripts/jsonl_to_journal.py \
-  --input /path/to/data.jsonl \
   --date-from 2026-03-01 \
   --date-to 2026-03-31 \
   --timezone Asia/Shanghai \
@@ -72,6 +58,9 @@ python3 scripts/jsonl_to_journal.py \
 
 跨平台说明：
 
+- 脚本会直接读取当前平台固定的 VocoType 数据集路径，不需要手动传 `--input`。
+- macOS 固定路径：`~/Library/Application Support/VocoType/dataset/dataset.jsonl`
+- Windows 固定路径：`%APPDATA%\VocoType\dataset\dataset.jsonl`
 - 脚本既支持 `Asia/Shanghai` 这种 IANA 时区名，也支持 `China Standard Time` 这种常见 Windows 时区名。
 - 输入编码默认使用 `utf-8-sig`，因此普通 UTF-8 和带 BOM 的 UTF-8 文件都能读取。
 - 在 Windows PowerShell 下生成最终日记时，优先使用 `--output` 输出到文件，而不是依赖 stdout。
@@ -109,4 +98,4 @@ python3 scripts/jsonl_to_journal.py \
 
 ## 自动化边界
 
-这个 skill 只负责“如何把原始记录整理成日记”。如果用户想每天定时运行，需要另外配置 automation。调度时间、工作区、输入路径和输出目录都应放在 automation 配置里，而不是写死在 skill 说明里。
+这个 skill 只负责“如何把原始记录整理成日记”。如果用户想每天定时运行，需要另外配置 automation。调度时间、工作区和输出目录都应放在 automation 配置里；输入数据集路径已经固定在脚本里。

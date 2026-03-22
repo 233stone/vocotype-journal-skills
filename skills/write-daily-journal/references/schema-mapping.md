@@ -15,14 +15,14 @@
 
 ## 怎么检查
 
-先预览前几行：
+脚本默认直接读取 VocoType 固定数据集路径。排查字段时，先预览前几行：
 
 ```bash
-sed -n '1,20p' /path/to/data.jsonl
+sed -n '1,20p' ~/Library/Application\ Support/VocoType/dataset/dataset.jsonl
 ```
 
 ```powershell
-Get-Content -Path C:\path\to\data.jsonl -Encoding UTF8 -TotalCount 20
+Get-Content -Path "$env:APPDATA\VocoType\dataset\dataset.jsonl" -Encoding UTF8 -TotalCount 20
 ```
 
 重点看这几件事：

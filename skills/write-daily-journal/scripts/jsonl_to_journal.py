@@ -8,6 +8,7 @@ import datetime as dt
 import hashlib
 import json
 import math
+import os
 import pathlib
 import re
 import sys
@@ -142,14 +143,7 @@ class Event:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Extract a day's events from JSONL and render a Markdown journal draft."
-    )
-    parser.add_argument(
-        "--input",
-        action="append",
-        nargs="+",
-        required=True,
-        help="One or more JSONL files. Repeat --input when needed.",
+        description="Read VocoType's fixed dataset.jsonl path and render a Markdown journal draft."
     )
     parser.add_argument(
         "--date",
@@ -200,8 +194,22 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def flatten_paths(groups: list[list[str]]) -> list[pathlib.Path]:
-    return [pathlib.Path(value).expanduser() for group in groups for value in group]
+def default_dataset_path() -> pathlib.Path:
+    if sys.platform == "darwin":
+        base_dir = pathlib.Path.home() / "Library" / "Application Support"
+    elif sys.platform.startswith("win"):
+        appdata = os.environ.get("APPDATA")
+        if appdata:
+            base_dir = pathlib.Path(appdata)
+        else:
+            base_dir = pathlib.Path.home() / "AppData" / "Roaming"
+    else:
+        xdg_data_home = os.environ.get("XDG_DATA_HOME")
+        if xdg_data_home:
+            base_dir = pathlib.Path(xdg_data_home)
+        else:
+            base_dir = pathlib.Path.home() / ".local" / "share"
+    return base_dir / "VocoType" / "dataset" / "dataset.jsonl"
 
 
 def get_local_timezone() -> tuple[dt.tzinfo, str]:
@@ -794,16 +802,13 @@ def main() -> int:
 
     timezone, timezone_label = resolve_timezone(args.timezone)
     start_date, end_date = parse_requested_range(args, timezone)
-    paths = flatten_paths(args.input)
-    if not paths:
-        raise SystemExit("at least one --input path is required")
-    missing = [str(path) for path in paths if not path.exists()]
-    if missing:
-        raise SystemExit("missing input files: " + ", ".join(missing))
+    dataset_path = default_dataset_path()
+    if not dataset_path.exists():
+        raise SystemExit(f"default dataset file not found: {dataset_path}")
 
     field_map = load_field_map(args.field_map)
     events, stats = read_events(
-        paths=paths,
+        paths=[dataset_path],
         start_date=start_date,
         end_date=end_date,
         field_map=field_map,

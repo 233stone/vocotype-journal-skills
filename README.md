@@ -8,6 +8,8 @@ VocoType 相关的 Codex skills 仓库。
 
 这个 skill 用来直接读取 VocoType 保存下来的原始 `dataset.jsonl` 数据集，按单日或日期区间生成 Markdown 日记，不依赖已有日记做二次整理。
 
+脚本默认直接读取固定数据集路径，不需要手动传输入目录。
+
 ## 仓库结构
 
 ```text
@@ -37,6 +39,23 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
 
 - macOS: `~/Library/Application Support/VocoType/dataset/dataset.jsonl`
 - Windows: `%APPDATA%\\VocoType\\dataset\\dataset.jsonl`
+
+## 用法
+
+```bash
+python3 skills/write-daily-journal/scripts/jsonl_to_journal.py \
+  --date 2026-03-23 \
+  --timezone Asia/Shanghai \
+  --output /path/to/2026-03-23.md
+```
+
+```bash
+python3 skills/write-daily-journal/scripts/jsonl_to_journal.py \
+  --date-from 2026-03-01 \
+  --date-to 2026-03-31 \
+  --timezone Asia/Shanghai \
+  --output /path/to/2026-03-01_to_2026-03-31.md
+```
 
 ## 当前能力
 
