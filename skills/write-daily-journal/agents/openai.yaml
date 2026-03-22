@@ -1,0 +1,4 @@
+interface:
+  display_name: "Daily Journal Writer"
+  short_description: "Generate a daily journal from saved JSONL data"
+  default_prompt: "Use $write-daily-journal to read my saved dataset and produce a daily journal as Markdown."
